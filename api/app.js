@@ -1,5 +1,6 @@
 const express = require("express");
 const userRouter = require("./routes/userRouter.js");
+const postRouter = require("./routes/postRouter.js");
 
 require("dotenv").config();
 
@@ -7,6 +8,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/users", userRouter);
+app.use("/posts", postRouter);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Not found" });
