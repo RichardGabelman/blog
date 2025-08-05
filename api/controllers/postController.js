@@ -26,7 +26,7 @@ async function getPosts(req, res, next) {
   } catch (err) {
     next(err);
   }
-};
+}
 
 async function getPostById(req, res, next) {
   try {
@@ -69,6 +69,6 @@ async function getPostById(req, res, next) {
   } catch (err) {
     next(err);
   }
-};
+}
 
 module.exports = { getPosts, getPostById };
