@@ -15,16 +15,32 @@ async function createUser(req, res, next) {
     const existingUser = await prisma.user.findUnique({
       where: { username },
     });
+
     if (existingUser) {
       return res.status(400).json({ error: "Username already taken" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const userRole = await prisma.role.findUnique({
+      where: {
+        name: "user",
+      },
+    });
+
+    if (!userRole) {
+      return res.status(500).json({ error: "User role not found" });
+    }
+
     const user = await prisma.user.create({
       data: {
         username,
         password: hashedPassword,
+        roles: {
+          create: {
+            roleId: userRole.id,
+          },
+        },
       },
     });
 
