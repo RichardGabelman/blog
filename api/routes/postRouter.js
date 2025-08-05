@@ -8,6 +8,7 @@ router.post("/", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
 
+// Consider breaking request down further into GET /:postId and GET /:postId/comments
 router.get("/:postId", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
@@ -18,9 +19,6 @@ router.delete("/:postId", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
 
-router.get("/:postId/comments", (req, res) => {
-  return res.status(501).json({ error: "Not implemented" });
-});
 router.post("/:postId/comments", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
