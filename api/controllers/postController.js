@@ -8,6 +8,7 @@ async function getPosts(req, res, next) {
       where: {
         published: true,
       },
+      orderBy: { createdAt: "desc" },
       select: {
         id: true,
         createdAt: true,
