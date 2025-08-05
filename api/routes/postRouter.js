@@ -1,9 +1,9 @@
 const express = require("express");
+const postController = require("../controllers/postController");
+
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  return res.status(501).json({ error: "Not implemented" });
-});
+router.get("/", postController.getPosts);
 router.post("/", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
