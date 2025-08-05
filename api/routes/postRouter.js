@@ -9,9 +9,7 @@ router.post("/", (req, res) => {
 });
 
 // Consider breaking request down further into GET /:postId and GET /:postId/comments
-router.get("/:postId", (req, res) => {
-  return res.status(501).json({ error: "Not implemented" });
-});
+router.get("/:postId", postController.getPostById);
 router.put("/:postId", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
