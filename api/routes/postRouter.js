@@ -11,9 +11,6 @@ router.post("/", (req, res) => {
 router.get("/:postId", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
-router.post("/:postId", (req, res) => {
-  return res.status(501).json({ error: "Not implemented" });
-});
 router.put("/:postId", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
