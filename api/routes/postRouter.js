@@ -1,9 +1,18 @@
 const express = require("express");
 const postController = require("../controllers/postController");
+const passport = require("passport");
 
 const router = express.Router();
 
-router.get("/", postController.getPosts);
+function optionalAuth(req, res, next) {
+  passport.authenticate("jwt", { session: false }, (err, user) => {
+    if (err) return next(err);
+    if (user) req.user = user; // attach user only if valid token
+    next(); // continue regardless
+  })(req, res, next);
+}
+
+router.get("/", optionalAuth, postController.getPosts);
 router.post("/", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });

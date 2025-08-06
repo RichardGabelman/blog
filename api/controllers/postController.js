@@ -1,27 +1,44 @@
 const prisma = require("../prisma");
 
-// TODO: Implement conditional filtering based on auth
-// Admins should be able to see all posts, not just published
 async function getPosts(req, res, next) {
-  try {
-    const posts = await prisma.post.findMany({
-      where: {
-        published: true,
-      },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        createdAt: true,
-        updatedAt: true,
-        title: true,
-        author: {
-          select: {
-            username: true,
-          },
+  let query = {
+    where: {
+      published: true,
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      title: true,
+      author: {
+        select: {
+          username: true,
         },
       },
-    });
+    },
+  };
+  try {
+    if (req.user) {
+      const adminRole = await prisma.role.findUnique({
+        where: {
+          name: "admin",
+        },
+      });
 
+      const userHasAdminRole = await prisma.userRole.findFirst({
+        where: {
+          userId: req.user.id,
+          roleId: adminRole.id,
+        },
+      });
+
+      if (userHasAdminRole) {
+        delete query.where.published;
+      }
+    }
+
+    const posts = await prisma.post.findMany(query);
     res.status(200).json(posts);
   } catch (err) {
     next(err);
