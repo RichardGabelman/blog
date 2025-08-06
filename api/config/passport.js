@@ -39,7 +39,16 @@ passport.use(
     try {
       const user = await prisma.user.findUnique({
         where: {
-          id: jwt_payload.sub,
+          id: jwt_payload.id,
+        },
+        select: {
+          id: true,
+          username: true,
+          roles: {
+            select: {
+              name: true,
+            },
+          },
         },
       });
 
