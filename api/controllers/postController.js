@@ -1,45 +1,34 @@
 const prisma = require("../prisma");
 
 async function getPosts(req, res, next) {
-  let query = {
-    where: {
-      published: true,
-    },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      title: true,
-      author: {
-        select: {
-          username: true,
-        },
-      },
-    },
-  };
+  let where = { published: true };
 
   try {
     if (req.user) {
-      const adminRole = await prisma.role.findUnique({
-        where: {
-          name: "admin",
-        },
-      });
-
-      const userHasAdminRole = await prisma.userRole.findFirst({
-        where: {
-          userId: req.user.id,
-          roleId: adminRole.id,
-        },
-      });
+      const userHasAdminRole = req.user.roles.some(
+        (role) => role.name === "admin"
+      );
 
       if (userHasAdminRole) {
-        delete query.where.published;
+        where = {};
       }
     }
 
-    const posts = await prisma.post.findMany(query);
+    const posts = await prisma.post.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        title: true,
+        author: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
     res.status(200).json(posts);
   } catch (err) {
     next(err);
@@ -47,59 +36,48 @@ async function getPosts(req, res, next) {
 }
 
 async function getPostById(req, res, next) {
-  let query = {
-    where: {
-      id: Number(req.params.postId),
-      published: true,
-    },
-    select: {
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      title: true,
-      content: true,
-      published: true,
-      author: {
-        select: {
-          username: true,
+  let where = { id: Number(req.params.postId), published: true };
+
+  try {
+    if (req.user) {
+      const userHasAdminRole = req.user.roles.some(
+        (role) => role.name === "admin"
+      );
+
+      if (userHasAdminRole) {
+        where = { id: Number(req.params.postId) };
+      }
+    }
+
+    const post = await prisma.post.findFirst({
+      where,
+      select: {
+        id: true,
+        createdAt: true,
+        updatedAt: true,
+        title: true,
+        content: true,
+        published: true,
+        author: {
+          select: {
+            username: true,
+          },
         },
-      },
-      comments: {
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          createdAt: true,
-          content: true,
-          author: {
-            select: {
-              username: true,
+        comments: {
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            createdAt: true,
+            content: true,
+            author: {
+              select: {
+                username: true,
+              },
             },
           },
         },
       },
-    },
-  };
-  try {
-    if (req.user) {
-      const adminRole = await prisma.role.findUnique({
-        where: {
-          name: "admin",
-        },
-      });
-
-      const userHasAdminRole = await prisma.userRole.findFirst({
-        where: {
-          userId: req.user.id,
-          roleId: adminRole.id,
-        },
-      });
-
-      if (userHasAdminRole) {
-        delete query.where.published;
-      }
-    }
-
-    const post = await prisma.post.findFirst(query);
+    });
 
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
