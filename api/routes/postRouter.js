@@ -12,6 +12,23 @@ function optionalAuth(req, res, next) {
   })(req, res, next);
 }
 
+function adminAuth(req, res, next) {
+  passport.authenticate("jwt", { session: false }, (err, user) => {
+    if (err) return next(err);
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const isAdmin = user.roles.some(role => role.name === "admin");
+    if (!isAdmin) {
+      return res.status(403).json({ message: "Forbidden: Admins only" });
+    }
+
+    req.user = user;
+    next();
+  })(req, res, next);
+}
+
 router.get("/", optionalAuth, postController.getPosts);
 router.post("/", (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
