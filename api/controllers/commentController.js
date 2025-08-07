@@ -25,4 +25,29 @@ async function createComment(req, res, next) {
   }
 }
 
-module.exports = { createComment };
+async function updateComment(req, res, next) {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { content } = req.body;
+
+  try {
+    const updated = await prisma.comment.update({
+      where: {
+        id: req.comment.id,
+      },
+      data: {
+        content,
+      },
+    });
+
+    return res.status(200).json(updated);
+  } catch(err) {
+    return next(err);
+  }
+}
+
+module.exports = { createComment, updateComment };

@@ -14,6 +14,7 @@ const {
   checkPostExists,
   checkPostExistsAndPublished,
 } = require("../middleware/postExists");
+const checkCommentExists = require("../middleware/commentExists");
 
 const router = express.Router();
 
@@ -53,15 +54,16 @@ router.put(
   "/:postId/comments/:commentId",
   auth,
   checkPostExistsAndPublished,
+  checkCommentExists,
   isCommentAuthor,
   commentValidate,
-  (req, res) => {
-    return res.status(501).json({ error: "Not implemented" });
-  }
+  commentController.updateComment
 );
 router.delete(
   "/:postId/comments/:commentId",
   auth,
+  checkPostExists,
+  checkCommentExists,
   isCommentAuthorOrAdmin,
   (req, res) => {
     return res.status(501).json({ error: "Not implemented" });
