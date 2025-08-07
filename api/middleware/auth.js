@@ -1,4 +1,5 @@
 const passport = require("passport");
+const prisma = require("../prisma");
 
 function auth(req, res, next) {
   passport.authenticate("jwt", { session: false }, (err, user) => {
@@ -34,4 +35,32 @@ function adminAuth(req, res, next) {
   })(req, res, next);
 }
 
-module.exports = { auth, optionalAuth, adminAuth };
+async function isCommentAuthor(req, res, next) {
+  try {
+    const { commentId } = req.params;
+    const userId = req.user.id;
+
+    const comment = await prisma.comment.findUnique({
+      where: {
+        id: Number(commentId),
+      },
+      select: {
+        authorId: true,
+      },
+    });
+
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+
+    if (comment.authorId !== userId) {
+      return res.status(403).json({ error: "Forbidden: not the author" });
+    }
+
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { auth, optionalAuth, adminAuth, isCommentAuthor };
