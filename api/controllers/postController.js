@@ -1,4 +1,5 @@
 const prisma = require("../prisma");
+const { validationResult } = require("express-validator");
 
 async function getPosts(req, res, next) {
   let where = { published: true };
@@ -89,4 +90,40 @@ async function getPostById(req, res, next) {
   }
 }
 
-module.exports = { getPosts, getPostById };
+async function createPost(req, res, next) {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { title, content, published } = req.body;
+  const authorId = req.user.id;
+  
+  try {
+    const post = await prisma.post.create({
+      data: {
+        title,
+        content: content ?? null,
+        published: published,
+        author: {
+          connect: { id: authorId }
+        }
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+      }
+    });
+
+    return res.status(201).json(post);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getPosts, getPostById, createPost };

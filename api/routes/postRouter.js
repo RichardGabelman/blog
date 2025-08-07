@@ -12,9 +12,7 @@ const {
 const router = express.Router();
 
 router.get("/", optionalAuth, postController.getPosts);
-router.post("/", adminAuth, validateCreatePost, (req, res) => {
-  return res.status(501).json({ error: "Not implemented" });
-});
+router.post("/", adminAuth, validateCreatePost, postController.createPost);
 
 // Consider breaking request down further into GET /:postId and GET /:postId/comments
 router.get("/:postId", optionalAuth, postController.getPostById);
