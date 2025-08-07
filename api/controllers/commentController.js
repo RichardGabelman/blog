@@ -46,8 +46,22 @@ async function updateComment(req, res, next) {
 
     return res.status(200).json(updated);
   } catch(err) {
-    return next(err);
+    next(err);
   }
 }
 
-module.exports = { createComment, updateComment };
+async function deleteComment(req, res, next) {
+  try {
+    await prisma.comment.delete({
+      where: {
+        id: req.comment.id,
+      },
+    });
+
+    return res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { createComment, updateComment, deleteComment };

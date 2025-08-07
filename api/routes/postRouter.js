@@ -65,9 +65,7 @@ router.delete(
   checkPostExists,
   checkCommentExists,
   isCommentAuthorOrAdmin,
-  (req, res) => {
-    return res.status(501).json({ error: "Not implemented" });
-  }
+  commentController.deleteComment
 );
 
 module.exports = router;
