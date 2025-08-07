@@ -166,7 +166,19 @@ async function updatePost(req, res, next) {
 }
 
 async function deletePost(req, res, next) {
+  const postId = req.post.id;
 
+  try {
+    await prisma.post.delete({
+      where: {
+        id: postId,
+      },
+    });
+
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
 }
 
 
