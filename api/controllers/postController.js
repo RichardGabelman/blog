@@ -133,25 +133,12 @@ async function updatePost(req, res, next) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const postId = Number(req.params.postId);
+  const postId = req.post.id;
   const { title, content, published } = req.body;
   const userId = req.user.id;
 
   try {
-    const existingPost = await prisma.post.findUnique({
-      where: {
-        id: postId,
-      },
-      select: {
-        authorId: true,
-      },
-    });
-
-    if (!existingPost) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-
-    if (existingPost.authorId !== userId) {
+    if (req.post.authorId !== userId) {
       return res.status(403).json({ error: "You are not the author of this post" });
     }
 
@@ -178,4 +165,9 @@ async function updatePost(req, res, next) {
   }
 }
 
-module.exports = { getPosts, getPostById, createPost, updatePost };
+async function deletePost(req, res, next) {
+
+}
+
+
+module.exports = { getPosts, getPostById, createPost, updatePost, deletePost };

@@ -17,7 +17,7 @@ router.post("/", adminAuth, postValidate.validateCreatePost, postController.crea
 
 // Consider breaking request down further into GET /:postId and GET /:postId/comments
 router.get("/:postId", optionalAuth, postController.getPostById);
-router.put("/:postId", adminAuth, postValidate.validateUpdatePost, postController.updatePost);
+router.put("/:postId", adminAuth, checkPostExists, postValidate.validateUpdatePost, postController.updatePost);
 router.delete("/:postId", adminAuth, (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
