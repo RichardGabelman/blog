@@ -63,4 +63,29 @@ async function isCommentAuthor(req, res, next) {
   }
 }
 
-module.exports = { auth, optionalAuth, adminAuth, isCommentAuthor };
+async function isCommentAuthorOrAdmin(req, res, next) {
+  try {
+    const { commentId } = req.params;
+    const userId = req.user.id;
+    const isAdmin = req.user.roles.some(role => role.name === "admin");
+
+    const comment = await prisma.comment.findUnique({
+      where: { id: Number(commentId) },
+      select: { authorId: true },
+    });
+
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+
+    if (comment.authorId !== userId && !isAdmin) {
+      return res.status(403).json({ error: "Forbidden: not authorized" });
+    }
+
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { auth, optionalAuth, adminAuth, isCommentAuthor, isCommentAuthorOrAdmin };

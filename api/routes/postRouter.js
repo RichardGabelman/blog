@@ -1,6 +1,12 @@
 const express = require("express");
 const postController = require("../controllers/postController");
-const { auth, optionalAuth, adminAuth, isCommentAuthor } = require("../middleware/auth");
+const {
+  auth,
+  optionalAuth,
+  adminAuth,
+  isCommentAuthor,
+  isCommentAuthorOrAdmin,
+} = require("../middleware/auth");
 
 const router = express.Router();
 
@@ -22,11 +28,21 @@ router.post("/:postId/comments", auth, (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
 
-router.put("/:postId/comments/:commentId", auth, isCommentAuthor, (req, res) => {
-  return res.status(501).json({ error: "Not implemented" });
-});
-router.delete("/:postId/comments/:commentId", auth, (req, res) => {
-  return res.status(501).json({ error: "Not implemented" });
-});
+router.put(
+  "/:postId/comments/:commentId",
+  auth,
+  isCommentAuthor,
+  (req, res) => {
+    return res.status(501).json({ error: "Not implemented" });
+  }
+);
+router.delete(
+  "/:postId/comments/:commentId",
+  auth,
+  isCommentAuthorOrAdmin,
+  (req, res) => {
+    return res.status(501).json({ error: "Not implemented" });
+  }
+);
 
 module.exports = router;
