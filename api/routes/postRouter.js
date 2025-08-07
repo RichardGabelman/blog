@@ -1,5 +1,6 @@
 const express = require("express");
 const postController = require("../controllers/postController");
+const { body } = require("express-validator");
 const {
   auth,
   optionalAuth,
@@ -11,7 +12,20 @@ const {
 const router = express.Router();
 
 router.get("/", optionalAuth, postController.getPosts);
-router.post("/", adminAuth, (req, res) => {
+
+const validateCreatePost = [
+  body("title")
+    .trim()
+    .notEmpty().withMessage("Title is required")
+    .isLength({ max: 255 }).withMessage("Title must be at most 255 characters"),
+  body("content")
+    .optional()
+    .isString().withMessage("Content must be a string"),
+  body("published")
+    .optional()
+    .isBoolean().withMessage("Published must be a boolean"),
+];
+router.post("/", adminAuth, validateCreatePost, (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
 
