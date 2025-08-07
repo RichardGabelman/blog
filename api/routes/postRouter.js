@@ -1,6 +1,6 @@
 const express = require("express");
 const postController = require("../controllers/postController");
-const validateCreatePost = require("../middleware/validators/postValidators");
+const postValidate = require("../middleware/validators/postValidators");
 const {
   auth,
   optionalAuth,
@@ -8,15 +8,16 @@ const {
   isCommentAuthor,
   isCommentAuthorOrAdmin,
 } = require("../middleware/auth");
+const checkPostExists = require("../middleware/postExists");
 
 const router = express.Router();
 
 router.get("/", optionalAuth, postController.getPosts);
-router.post("/", adminAuth, validateCreatePost, postController.createPost);
+router.post("/", adminAuth, postValidate.validateCreatePost, postController.createPost);
 
 // Consider breaking request down further into GET /:postId and GET /:postId/comments
 router.get("/:postId", optionalAuth, postController.getPostById);
-router.put("/:postId", adminAuth, (req, res) => {
+router.put("/:postId", adminAuth, postValidate.validateUpdatePost, (req, res) => {
   return res.status(501).json({ error: "Not implemented" });
 });
 router.delete("/:postId", adminAuth, (req, res) => {
